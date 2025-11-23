@@ -4,4 +4,6 @@
 ../Src/main.c:64:29:init_scheduler_stack	0	static,ignoring_inline_asm
 ../Src/main.c:70:6:init_task_stack	16	static
 ../Src/main.c:96:10:get_psp_value	4	static
-../Src/main.c:101:29:switch_msp_to_psp	0	static,ignoring_inline_asm
+../Src/main.c:101:6:save_psp_value	16	static
+../Src/main.c:105:29:switch_msp_to_psp	0	static,ignoring_inline_asm
+../Src/main.c:117:6:get_next_task	4	static

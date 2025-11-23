@@ -1,3 +1,3 @@
 ../Src/system.c:11:6:nvic_en_irq	1
 ../Src/system.c:18:6:systick_init	1
-../Src/system.c:30:6:SysTick_Handler	1
+../Src/system.c:30:29:SysTick_Handler	1

@@ -51,6 +51,12 @@ default.size.stdout \
 OBJDUMP_LIST += \
 Task_Scheduler.list \
 
+OBJCOPY_HEX += \
+Task_Scheduler.hex \
+
+OBJCOPY_BIN += \
+Task_Scheduler.bin \
+
 
 # All Target
 all: main-build
@@ -74,12 +80,22 @@ Task_Scheduler.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+Task_Scheduler.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "Task_Scheduler.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+Task_Scheduler.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Task_Scheduler.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) Task_Scheduler.elf Task_Scheduler.list Task_Scheduler.map default.size.stdout
+	-$(RM) Task_Scheduler.bin Task_Scheduler.elf Task_Scheduler.hex Task_Scheduler.list Task_Scheduler.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

@@ -27,19 +27,21 @@ void systick_init(void)
 
 }
 
-void SysTick_Handler(void)
+__attribute__((naked)) void SysTick_Handler(void)
 {
-	/*
-	 * save the context of the current task
-	 * 1. Get runing current task's PSP value
-	 * 2. Using that PSP value store SF2 (R4 to R11)
-	 * 3. save the current value of PSP
-	 *
-	 * Retrive the context of next task
-	 *
-	 * 1. Decide next task to run
-	 * 2. get its past PSP value
-	 * 3. using that PSP value retrieve SF2
-	 * 4. update the PSP and exit
-	 */
+	__asm volatile("MRS R0, PSP"); // Read the PSP value in RO
+	 __asm volatile("STMDB R0!, {R4-R11}"); // Save the R4-R11 register to private stack
+	 __asm volatile("PUSH {LR}"); // Preserve the LR
+	 __asm volatile("BL save_psp_value"); // Save the current tasks PSP to global array.
+	 __asm volatile("pop {LR}"); // Retrieve the LR
+
+
+	 __asm volatile("PUSH {LR}"); // Push LR as we going to call multiple functions below
+	  __asm volatile("BL get_next_task"); // decides which task to run next
+	  __asm volatile("BL get_psp_value"); // get the next tasks stored PSP. this is the lates PSP of that task.
+	  __asm volatile("LDMIA R0!,{R4-R11}"); // retrieve the R4-R11 register values
+	  __asm volatile("MSR PSP,R0"); // assing PSP
+	  __asm volatile("pop {LR}"); // pop LR
+	  __asm volatile("BX LR"); // exit the handler.
+
 }

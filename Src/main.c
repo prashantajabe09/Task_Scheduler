@@ -39,8 +39,8 @@ int main(void)
 
 	init_scheduler_stack(SHCEDULER_STACK_START);
 	init_task_stack();
-	systick_init();
 	switch_msp_to_psp();
+	systick_init();
 	Task1_Handler();
     /* Loop forever */
 	for(;;);
@@ -98,14 +98,24 @@ uint32_t get_psp_value(void)
 	return psp_of_tasks[current_task];
 }
 
+void save_psp_value(uint32_t psp_value)
+{
+	psp_of_tasks[current_task] = psp_value;
+}
 __attribute__((naked)) void switch_msp_to_psp(void)
 {
 	__asm volatile("PUSH {LR}");
-	__asm volatile("BL get_psp_value");
-	__asm volatile("MSR PSP,R0");
-	__asm volatile("MOV R0,#0x02");
-	__asm volatile("MSR CONTROL,R0");
-	__asm volatile("POP {LR}");
-	__asm volatile("BX LR");
+	 __asm volatile("BL get_psp_value"); // get current tasks psp value
+	 __asm volatile("POP {LR}");
+	 __asm volatile("MSR PSP,R0"); // assign current tasks psp to PSP
+	 __asm volatile("MOV R0,#0x02");
+	 __asm volatile("MSR CONTROL,R0"); // change sp from MSP to PSP
+	 __asm volatile("BX LR");
 
+}
+
+void get_next_task(void)
+{
+	current_task++;
+	current_task %= MAX_TASKS;
 }
